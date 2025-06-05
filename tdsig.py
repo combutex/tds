@@ -44,7 +44,7 @@ def duyet_job(type_job, token, uid):
             print(dai)
             print(f"{Colors.cyan}Nhận thành công {r['data']['job_success']} nhiệm vụ | {Colors.green}{r['data']['msg']} | {Colors.yellow}{r['data']['xu']}")
             print(dai)
-            return 'success'
+            return 'error'
         else:
             print(f"{Colors.red}{r['error']}")
             return 'error'
