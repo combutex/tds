@@ -1,22 +1,26 @@
+# Coded by Traodoisub.com - Re-coded for Instagram based on TikTok script
 import os
 from time import sleep
 from datetime import datetime
 
+# Đặt múi giờ cho chính xác (nếu cần)
+os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
+
 try:
     import requests
-except:
+except ImportError:
     os.system("pip3 install requests")
     import requests
 
 try:
     from pystyle import Colors, Colorate, Write, Center, Add, Box
-except:
+except ImportError:
     os.system("pip3 install pystyle")
     from pystyle import Colors, Colorate, Write, Center, Add, Box
 
 headers = {
     'authority': 'traodoisub.com',
-    'accept': 'application/json',
+    'accept': 'application/json', # Đã đổi thành application/json cho API
     'accept-language': 'en-US,en;q=0.9,vi;q=0.8',
     'user-agent': 'traodoisub instagram tool',
 }
@@ -31,42 +35,13 @@ def login_tds(token):
         else:
             print(Colors.red + f"Token TDS không hợp lệ, hãy kiểm tra lại!\n")
             return 'error_token'
-    except:
+    except Exception as e:
+        print(f"{Colors.red}Lỗi kết nối hoặc xử lý dữ liệu khi đăng nhập: {e}")
         return 'error'
 
-def duyet_job(type_job, token, uid):
+def load_job(type_job, token):
     try:
-        r = requests.get(f'https://traodoisub.com/api/coin/?type={type_job}&id={uid}&access_token={token}', headers=headers, timeout=5).json()
-        if "cache" in r:
-            return r['cache']
-        elif "success" in r:
-            dai = f'{Colors.yellow}------------------------------------------'
-            print(dai)
-            print(f"{Colors.cyan}Nhận thành công {r['data']['job_success']} nhiệm vụ | {Colors.green}{r['data']['msg']} | {Colors.yellow}{r['data']['xu']}")
-            print(dai)
-            return 'error'
-        else:
-            print(f"{Colors.red}{r['error']}")
-            return 'error'
-    except:
-        return 'error'
-
-def nhan_xu(type_job, token, id_job):
-    try:
-        r = requests.get(f'https://traodoisub.com/api/coin/?type={type_job}&id={id_job}&access_token={token}', headers=headers, timeout=5).json()
-        if "success" in r:
-            print(f"{Colors.green}Nhận xu thành công: {r['data']['msg']} | Xu hiện tại: {Colors.yellow}{r['data']['xu']}")
-            return True
-        else:
-            print(f"{Colors.red}Lỗi nhận xu: {r.get('error', 'Không rõ lỗi')}")
-            return False
-    except:
-        print(f"{Colors.red}Lỗi kết nối khi nhận xu!")
-        return False
-
-def get_instagram_jobs(token):
-    try:
-        r = requests.get(f'https://traodoisub.com/api/?fields=instagram_follow&access_token={token}', headers=headers, timeout=5).json()
+        r = requests.get('https://traodoisub.com/api/?fields='+type_job+'&access_token='+token, headers=headers, timeout=5).json()
         if 'data' in r:
             return r
         elif "countdown" in r:
@@ -77,12 +52,49 @@ def get_instagram_jobs(token):
             print(Colors.red + f"{r['error']}\n")
             return 'error_error'
     except Exception as e:
-        print(f"{Colors.red}Lỗi kết nối khi lấy job: {e}")
+        print(f"{Colors.red}Lỗi kết nối hoặc xử lý dữ liệu khi tải job: {e}")
         return 'error'
+
+def duyet_job(type_job, token, uid):
+    try:
+        r = requests.get(f'https://traodoisub.com/api/coin/?type={type_job}&id={uid}&access_token={token}', headers=headers, timeout=5).json()
+        if "cache" in r:
+            # API trả về 'cache' là số, nên không cần chuyển đổi ở đây.
+            # Trả về giá trị số lượng cache
+            return r['cache']
+        elif "success" in r:
+            dai = f'{Colors.yellow}------------------------------------------'
+            print(dai)
+            print(f"{Colors.cyan}Nhận thành công {r['data']['job_success']} nhiệm vụ | {Colors.green}{r['data']['msg']} | {Colors.yellow}{r['data']['xu']}")
+            print(dai)
+            # Trả về một giá trị đặc biệt để báo hiệu đã hoàn thành và nhận xu
+            return 'job_completed' 
+        else:
+            print(f"{Colors.red}{r['error']}")
+            return 'error'
+    except Exception as e:
+        print(f"{Colors.red}Lỗi kết nối hoặc xử lý dữ liệu khi duyệt job: {e}")
+        return 'error'
+
+# Hàm này không còn được gọi trực tiếp trong vòng lặp chính
+# vì việc nhận xu đã được xử lý trong hàm duyet_job khi API báo 'success'
+# Tuy nhiên, giữ lại nếu bạn có thể cần gọi nó cho mục đích khác.
+def nhan_xu_api(type_job, token, id_job):
+    try:
+        r = requests.get(f'https://traodoisub.com/api/coin/?type={type_job}&id={id_job}&access_token={token}', headers=headers, timeout=5).json()
+        if "success" in r:
+            print(f"{Colors.green}Nhận xu thành công: {r['data']['msg']} | Xu hiện tại: {Colors.yellow}{r['data']['xu']}")
+            return True
+        else:
+            print(f"{Colors.red}Lỗi nhận xu: {r.get('error', 'Không rõ lỗi')}")
+            return False
+    except Exception as e:
+        print(f"{Colors.red}Lỗi kết nối khi nhận xu: {e}!")
+        return False
 
 def check_instagram(id_instagram, token):
     try:
-        r = requests.get(f'https://traodoisub.com/api/?fields=instagram_run&id={id_instagram}&access_token={token}', headers=headers, timeout=5).json()
+        r = requests.get('https://traodoisub.com/api/?fields=instagram_run&id='+id_instagram+'&access_token='+token, headers=headers, timeout=5).json()
         if 'success' in r:
             os.system('clear')
             print(Colors.green + f"{r['data']['msg']}|ID: {Colors.yellow + r['data']['id'] + Colors.green}")
@@ -90,23 +102,33 @@ def check_instagram(id_instagram, token):
         else:
             print(Colors.red + f"{r['error']}\n")
             return 'error_token'
-    except:
+    except Exception as e:
+        print(f"{Colors.red}Lỗi kết nối hoặc xử lý dữ liệu khi check Instagram ID: {e}")
         return 'error'
 
 os.system('clear')
 banner = r'''
 ████████╗██████╗ ███████╗
 ╚══██╔══╝██╔══██╗██╔════╝
-   ██║   ██║  ██║███████╗
-   ██║   ██║  ██║╚════██║
-   ██║   ██████╔╝███████║
-   ╚═╝   ╚═════╝ ╚══════╝
+    ██║   ██║  ██║███████╗
+    ██║   ██║  ██║╚════██║
+    ██║   ██████╔╝███████║
+    ╚═╝   ╚═════╝ ╚══════╝
 '''
 gach  = '========================================='
-option = f'''{gach}{Colors.green}\nDanh sách nhiệm vụ tool hỗ trợ: {Colors.red}\n1. Follow Instagram\n{Colors.yellow}{gach}\n'''
-option_acc = f'''{gach}{Colors.green}\nDanh sách lựa chọn: {Colors.red}\n1. Tiếp tục sử dụng acc TDS đã lưu\n2. Sử dụng acc TDS mới\n{Colors.yellow}{gach}\n'''
+option = f'''{gach}{Colors.green}
+Danh sách nhiệm vụ tool hỗ trợ: {Colors.red}
+1. Follow Instagram
+{Colors.yellow}{gach}
+'''
+option_acc = f'''{gach}{Colors.green}
+Danh sách lựa chọn: {Colors.red}
+1. Tiếp tục sử dụng acc TDS đã lưu
+2. Sử dụng acc TDS mới
+{Colors.yellow}{gach}
+'''
 print(Colorate.Horizontal(Colors.yellow_to_red, Center.XCenter(banner)))
-print(Colors.red + Center.XCenter(Box.DoubleCube("Tool TDS Instagram free version 1.0")))
+print(Colors.red + Center.XCenter(Box.DoubleCube("Tool TDS Instagram free version 1.0 (Hoàn chỉnh)")))
 
 while True:
     try:
@@ -139,11 +161,13 @@ while True:
                 except:
                     os.system('clear')
                     print(Colors.red + f"Lỗi lựa chọn!! Chỉ nhập 1 hoặc 2\n")
+            
             os.system('clear')
             if choice == 1:
                 break
             else:
                 os.remove('TDS_IG.txt')
+
         else:
             f = open(f'TDS_IG.txt', 'w')
             f.write(f'{token_tds}')
@@ -215,30 +239,47 @@ if check_log == 'success':
 
     os.system('clear')
 
-    type_load = 'instagram_follow'  # Placeholder
+    # Thiết lập các loại nhiệm vụ cho Instagram Follow
+    type_load = 'instagram_follow'
     type_duyet = 'INS_FOLLOW_CACHE'
-    type_nhan = 'INS_FOLLOW'
-    api_type = 'INS_FOLLOW_API'
-    type_type = 'FOLLOW'
+    type_nhan = 'INS_FOLLOW' # Tham số 'type' cho API nhận xu
+    api_type_nhan_xu = 'INS_FOLLOW_API' # Tham số 'id' cho API nhận xu khi là INS_FOLLOW
+    type_type = 'FOLLOW' # Kiểu nhiệm vụ hiển thị trên terminal
 
     dem_tong = 0
 
     while True:
-        list_job = get_instagram_jobs(token_tds)
+        list_job = load_job(type_load, token_tds)
         sleep(2)
+        # Kiểm tra list_job có phải dict, có 'data' và 'data' là list không rỗng
         if isinstance(list_job, dict) and 'data' in list_job and isinstance(list_job['data'], list) and len(list_job['data']) > 0:
             for job in list_job['data']:
                 uid = job['id']
                 link = job['link']
-                os.system(f'termux-open-url {link}')  # Termux: mở link trên Android
+                os.system(f'termux-open-url {link}')
+                
                 check_duyet = duyet_job(type_duyet, token_tds, uid)
-                if check_duyet != 'error':
+                
+                # Xử lý các trường hợp trả về của hàm duyet_job
+                if check_duyet == 'job_completed': # API báo đã nhận xu thành công (từ hàm duyet_job)
+                    dem_tong += 1 # Vẫn tăng đếm tổng vì job đã xong
+                    t_now = datetime.now().strftime("%H:%M:%S")
+                    print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid} {Colors.green}(Đã nhận xu)')
+                    
+                elif isinstance(check_duyet, int): # Nếu duyet_job trả về số lượng cache (là một số nguyên)
                     dem_tong += 1
                     t_now = datetime.now().strftime("%H:%M:%S")
                     print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid}')
-                    if check_duyet > 9:
+                    
+                    if check_duyet > 9: # Kiểm tra số lượng cache có lớn hơn 9 không
                         sleep(3)
-                        nhan_xu(type_nhan, token_tds, api_type)
+                        # Gọi API nhận xu riêng
+                        nhan_xu_api(type_nhan, token_tds, api_type_nhan_xu)
+                
+                elif check_duyet == 'error' or check_duyet == 'error_countdown' or check_duyet == 'error_error': # Nếu có lỗi khi duyệt hoặc countdown
+                    # Hàm duyet_job đã in thông báo lỗi, nên không cần in lại
+                    pass 
+                
                 if dem_tong == max_job:
                     break
                 else:
@@ -246,8 +287,9 @@ if check_log == 'success':
                         print(Colors.green + 'Vui lòng đợi: '+str(i)+' giây',end=('\r'))
                         sleep(1)
         else:
-            print(f"{Colors.red}Không có job nào, vui lòng thử lại sau!")
+            print(f"{Colors.red}Không có job nào hoặc lỗi khi tải job, vui lòng thử lại sau!")
             sleep(5)
+        
         if dem_tong == max_job:
             print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
-            break 
+            break
