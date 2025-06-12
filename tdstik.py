@@ -2,6 +2,8 @@
 import os
 from time import sleep
 from datetime import datetime
+import io
+from contextlib import redirect_stdout
 
 os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
 
@@ -251,19 +253,48 @@ if check_log == 'success':
 
 					if check_duyet > 9:
 						sleep(3)
-						a = duyet_job(type_nhan, token_tds, api_type)
-
-
-				if dem_tong == max_job:
-					break
-				else:
-					for i in range(delay,-1,-1):
-						print(Colors.green + 'Vui lòng đợi: '+str(i)+' giây',end=('\r'))
-						sleep(1)
-
-		if dem_tong == max_job:
-			print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
-			break
+						# Bắt lại output khi nhận xu
+						f = io.StringIO()
+						with redirect_stdout(f):
+							duyet_job(type_nhan, token_tds, api_type)
+						output = f.getvalue()
+						if '+0 xu' in output:
+							print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế, bạn nhận được +0 xu sau 10 nhiệm vụ!")
+							while True:
+								print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
+								print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
+								print(f"{Colors.red}2. Kết thúc chương trình")
+								opt = None
+								try:
+									opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
+								except:
+									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+									continue
+								if opt == 1:
+									while True:
+										id_tiktok = Write.Input("Nhập ID tiktok chạy (lấy ở mục cấu hình web):", Colors.green_to_yellow, interval=0.0025)
+										for _ in range(3):
+											check_log = check_tiktok(id_tiktok,token_tds)
+											if check_log == 'success' or check_log == 'error_token':
+												break
+											else:
+												sleep(2)
+										if check_log == 'success':
+											break
+										elif check_log == 'error_token':
+											os.system('clear')
+											print(Colors.red + f"ID tiktok chưa được thêm vào cấu hình, vui lòng thêm vào cấu hình rồi nhập lại!\n")
+										else:
+											os.system('clear')
+											print(Colors.red + f"Lỗi sever vui lòng nhập lại!\n")
+									dem_tong = 0
+									os.system('clear')
+									break
+								elif opt == 2:
+									print(Colors.red + "Kết thúc chương trình!")
+									exit()
+								else:
+									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
 
 
 
