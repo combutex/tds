@@ -4,6 +4,7 @@ from time import sleep
 from datetime import datetime
 import io
 from contextlib import redirect_stdout
+import sys
 
 os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
 
@@ -85,6 +86,46 @@ def check_tiktok(id_tiktok, token):
 	except:
 		return 'error'
 
+def chon_id_tiktok():
+	ids = []
+	try:
+		with open('tiktok_ids.txt', 'r') as f:
+			for line in f:
+				if '|' in line:
+					id_, username = line.strip().split('|', 1)
+					ids.append((id_, username))
+				elif line.strip():
+					ids.append((line.strip(), ''))
+	except FileNotFoundError:
+		pass
+	if ids:
+		print(Colors.yellow + 'Danh sách ID TikTok đã lưu:')
+		for idx, (id_, username) in enumerate(ids, 1):
+			print(f'{Colors.green}{idx}. {Colors.cyan}{id_} {Colors.light_gray}| {Colors.pink}{username}')
+		print(f'{Colors.green}{len(ids)+1}. {Colors.red}Nhập ID mới')
+		while True:
+			try:
+				chon = int(Write.Input('Chọn số thứ tự ID TikTok hoặc nhập số mới:', Colors.green_to_yellow, interval=0.0025))
+				if 1 <= chon <= len(ids):
+					return ids[chon-1][0]
+				elif chon == len(ids)+1:
+					break
+				else:
+					print(Colors.red + 'Chỉ chọn số trong danh sách!')
+			except:
+				print(Colors.red + 'Chỉ chọn số trong danh sách!')
+	# Nhập ID mới
+	while True:
+		id_new = Write.Input('Nhập ID tiktok chạy (lấy ở mục cấu hình web):', Colors.green_to_yellow, interval=0.0025)
+		if id_new:
+			break
+	username_new = Write.Input('Nhập username TikTok tương ứng:', Colors.green_to_yellow, interval=0.0025)
+	if not any(id_new == id_ for id_, _ in ids):
+		luu = Write.Input('Bạn có muốn lưu ID này vào danh sách? (y/n):', Colors.green_to_yellow, interval=0.0025)
+		if luu.lower() == 'y':
+			with open('tiktok_ids.txt', 'a') as f:
+				f.write(f'{id_new}|{username_new}\n')
+	return id_new
 
 os.system('clear')
 banner = r'''
@@ -162,7 +203,7 @@ while True:
 if check_log == 'success':
 	#Nhập user tiktok
 	while True:
-		id_tiktok = Write.Input("Nhập ID tiktok chạy (lấy ở mục cấu hình web):", Colors.green_to_yellow, interval=0.0025)
+		id_tiktok = chon_id_tiktok()
 		for _ in range(3):
 			check_log = check_tiktok(id_tiktok,token_tds)
 			if check_log == 'success' or check_log == 'error_token':
@@ -251,6 +292,11 @@ if check_log == 'success':
 					t_now = datetime.now().strftime("%H:%M:%S")
 					print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid}')
 
+					# Bổ sung lại bộ đếm thời gian ngược sau mỗi nhiệm vụ
+					for i in range(delay, -1, -1):
+						print(Colors.green + 'Vui lòng đợi: ' + str(i) + ' giây', end='\r')
+						sleep(1)
+
 					if dem_tong == max_job:
 						print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
 						while True:
@@ -284,7 +330,7 @@ if check_log == 'success':
 									break
 								elif choice_menu == 2:
 									while True:
-										id_tiktok = Write.Input("Nhập ID tiktok chạy (lấy ở mục cấu hình web):", Colors.green_to_yellow, interval=0.0025)
+										id_tiktok = chon_id_tiktok()
 										for _ in range(3):
 											check_log = check_tiktok(id_tiktok,token_tds)
 											if check_log == 'success' or check_log == 'error_token':
@@ -322,7 +368,7 @@ if check_log == 'success':
 									break
 								elif choice_menu == 3:
 									print(Colors.red + "Kết thúc chương trình!")
-									exit()
+									sys.exit()
 								else:
 									print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
 							except:
