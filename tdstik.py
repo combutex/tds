@@ -398,6 +398,3 @@ if check_log == 'success':
 							except:
 								print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
 								continue
-
-
-
