@@ -277,8 +277,12 @@ if check_log == 'success':
 		type_type = 'TYM'
 
 	dem_tong = 0
+	doi_id = False
 
 	while True:
+		if doi_id:
+			doi_id = False
+			break
 		list_job = load_job(type_load, token_tds)
 		sleep(2)
 		if isinstance(list_job, dict) == True:
@@ -326,7 +330,7 @@ if check_log == 'success':
 									if check_log == 'success':
 										dem_tong = 0
 										check_duyet = 0
-										continue  # Quay lại vòng lặp chính
+										break  # Thoát khỏi vòng lặp while True
 									else:
 										print(Colors.red + f"ID tiktok chưa được thêm vào cấu hình, vui lòng thêm vào cấu hình rồi nhập lại!\n")
 										continue
@@ -335,6 +339,7 @@ if check_log == 'success':
 									os._exit(0)
 								else:
 									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+							break  # Thoát khỏi vòng lặp for
 
 					if dem_tong == max_job:
 						print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
@@ -377,6 +382,9 @@ if check_log == 'success':
 											else:
 												sleep(2)
 										if check_log == 'success':
+											dem_tong = 0
+											doi_id = True
+											os.system('clear')
 											break
 										elif check_log == 'error_token':
 											os.system('clear')
@@ -384,6 +392,8 @@ if check_log == 'success':
 										else:
 											os.system('clear')
 											print(Colors.red + f"Lỗi sever vui lòng nhập lại!\n")
+									if doi_id:
+										break
 									while True:
 										try:
 											delay = int(Write.Input("Thời gian delay giữa các job (giây):", Colors.green_to_yellow, interval=0.0025))
