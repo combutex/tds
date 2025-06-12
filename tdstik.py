@@ -317,7 +317,7 @@ if check_log == 'success':
 								if opt == 1:
 									id_tiktok = chon_id_tiktok()
 									dem_tong = 0
-									break
+									continue  # Quay lại vòng lặp chính
 								elif opt == 2:
 									print(Colors.red + "Kết thúc chương trình!")
 									os._exit(0)
