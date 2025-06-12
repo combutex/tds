@@ -5,6 +5,7 @@ from datetime import datetime
 import io
 from contextlib import redirect_stdout
 import sys
+import re
 
 os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
 
@@ -300,7 +301,13 @@ if check_log == 'success':
 					# Nhận xu nếu check_duyet > 9 (tránh lỗi tràn cache) và kiểm tra +0 xu
 					if check_duyet > 9:
 						msg = duyet_job(type_nhan, token_tds, api_type)
-						if isinstance(msg, str) and '+0 xu' in msg:
+						# Tìm số xu nhận được trong chuỗi msg
+						xu_nhan_duoc = None
+						match = re.search(r'\+([0-9]+) xu', msg)
+						if match:
+							xu_nhan_duoc = int(match.group(1))
+						# Nếu nhận được 0 xu thì hiện menu
+						if xu_nhan_duoc == 0:
 							print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế, bạn nhận được +0 xu sau 10 nhiệm vụ!")
 							while True:
 								print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
@@ -314,6 +321,7 @@ if check_log == 'success':
 									continue
 								if opt == 1:
 									id_tiktok = chon_id_tiktok()
+									dem_tong = 0
 									break
 								elif opt == 2:
 									print(Colors.red + "Kết thúc chương trình!")
