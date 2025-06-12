@@ -202,145 +202,117 @@ while True:
 		os.system('clear')
 
 if check_log == 'success':
-	#Nhập user tiktok
-	while True:
-		id_tiktok = chon_id_tiktok()
-		for _ in range(3):
-			check_log = check_tiktok(id_tiktok,token_tds)
-			if check_log == 'success' or check_log == 'error_token':
+	def run_jobs(token_tds):
+		while True:
+			id_tiktok = chon_id_tiktok()
+			for _ in range(3):
+				check_log = check_tiktok(id_tiktok,token_tds)
+				if check_log == 'success' or check_log == 'error_token':
+					break
+				else:
+					sleep(2)
+			if check_log == 'success':
 				break
+			elif check_log == 'error_token':
+				os.system('clear')
+				print(Colors.red + f"ID tiktok chưa được thêm vào cấu hình, vui lòng thêm vào cấu hình rồi nhập lại!\n")
 			else:
-				sleep(2)
+				os.system('clear')
+				print(Colors.red + f"Lỗi sever vui lòng nhập lại!\n")
 
-		if check_log == 'success':
-			break
-		elif check_log == 'error_token':
-			os.system('clear')
-			print(Colors.red + f"ID tiktok chưa được thêm vào cấu hình, vui lòng thêm vào cấu hình rồi nhập lại!\n")
-		else:
-			os.system('clear')
-			print(Colors.red + f"Lỗi sever vui lòng nhập lại!\n")
-
-	#Lựa chọn nhiệm vụ		
-	while True:
-		print(option)
-		try:
-			choice = int(Write.Input("Lựa chọn nhiệm vụ muốn làm (Ví dụ: Follow nhập 1):", Colors.green_to_yellow, interval=0.0025))
-			if choice in [1,2]:
-				break
-			else:
+		while True:
+			print(option)
+			try:
+				choice = int(Write.Input("Lựa chọn nhiệm vụ muốn làm (Ví dụ: Follow nhập 1):", Colors.green_to_yellow, interval=0.0025))
+				if choice in [1,2]:
+					break
+				else:
+					os.system('clear')
+					print(Colors.red + f"Lỗi lựa chọn!! Chỉ nhập 1 hoặc 2\n")
+			except:
 				os.system('clear')
 				print(Colors.red + f"Lỗi lựa chọn!! Chỉ nhập 1 hoặc 2\n")
-		except:
-			os.system('clear')
-			print(Colors.red + f"Lỗi lựa chọn!! Chỉ nhập 1 hoặc 2\n")
 
-	#Nhập delay nhiệm vụ
-	while True:
-		try:
-			delay = int(Write.Input("Thời gian delay giữa các job (giây):", Colors.green_to_yellow, interval=0.0025))
-			if delay > 1:
-				break
-			else:
+		while True:
+			try:
+				delay = int(Write.Input("Thời gian delay giữa các job (giây):", Colors.green_to_yellow, interval=0.0025))
+				if delay > 1:
+					break
+				else:
+					os.system('clear')
+					print(Colors.red + f"Delay tối thiểu là 3\n")
+			except:
 				os.system('clear')
-				print(Colors.red + f"Delay tối thiểu là 3\n")
-		except:
-			os.system('clear')
-			print(Colors.red + f"Vui lòng nhập một số > 2\n")
+				print(Colors.red + f"Vui lòng nhập một số > 2\n")
 
-	#Nhập max nhiệm vụ
-	while True:
-		try:
-			max_job = int(Write.Input("Dừng lại khi làm được số nhiệm vụ là:", Colors.green_to_yellow, interval=0.0025))
-			if max_job > 9:
-				break
-			else:
+		while True:
+			try:
+				max_job = int(Write.Input("Dừng lại khi làm được số nhiệm vụ là:", Colors.green_to_yellow, interval=0.0025))
+				if max_job > 9:
+					break
+				else:
+					os.system('clear')
+					print(Colors.red + f"Tối thiểu là 10\n")
+			except:
 				os.system('clear')
-				print(Colors.red + f"Tối thiểu là 10\n")
-		except:
-			os.system('clear')
-			print(Colors.red + f"Vui lòng nhập một số > 9\n")
+				print(Colors.red + f"Vui lòng nhập một số > 9\n")
 
-	os.system('clear')
+		os.system('clear')
 
-	if choice == 1:
-		type_load = 'tiktok_follow'
-		type_duyet = 'TIKTOK_FOLLOW_CACHE'
-		type_nhan = 'TIKTOK_FOLLOW'
-		type_type = 'FOLLOW'
-		api_type = 'TIKTOK_FOLLOW_API'
-	elif choice == 2:
-		type_load = 'tiktok_like'
-		type_duyet = 'TIKTOK_LIKE_CACHE'
-		type_nhan = 'TIKTOK_LIKE'
-		api_type = 'TIKTOK_LIKE_API'
-		type_type = 'TYM'
+		if choice == 1:
+			type_load = 'tiktok_follow'
+			type_duyet = 'TIKTOK_FOLLOW_CACHE'
+			type_nhan = 'TIKTOK_FOLLOW'
+			type_type = 'FOLLOW'
+			api_type = 'TIKTOK_FOLLOW_API'
+		elif choice == 2:
+			type_load = 'tiktok_like'
+			type_duyet = 'TIKTOK_LIKE_CACHE'
+			type_nhan = 'TIKTOK_LIKE'
+			api_type = 'TIKTOK_LIKE_API'
+			type_type = 'TYM'
 
-	dem_tong = 0
-	doi_id = False
+		dem_tong = 0
 
-	while True:
-		if doi_id:
-			doi_id = False
-			break
-		list_job = load_job(type_load, token_tds)
-		sleep(2)
-		if isinstance(list_job, dict) == True:
-			for job in list_job['data']:
-				uid = job['id']
-				link = job['link']
-				os.system(f'termux-open-url {link}')
-				check_duyet = duyet_job(type_duyet, token_tds, uid)
-				
-				if check_duyet != 'error':
-					dem_tong += 1
-					t_now = datetime.now().strftime("%H:%M:%S")
-					print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid}')
-
-					# Bổ sung lại bộ đếm thời gian ngược sau mỗi nhiệm vụ
-					for i in range(delay, -1, -1):
-						print(Colors.green + 'Vui lòng đợi: ' + str(i) + ' giây', end='\r')
-						sleep(1)
-
-					# Nhận xu nếu check_duyet > 9 (tránh lỗi tràn cache) và kiểm tra +0 xu
-					if check_duyet > 9:
-						msg = duyet_job(type_nhan, token_tds, api_type)
-						msg_str = msg["msg"] if isinstance(msg, dict) and "msg" in msg else str(msg)
-						if msg_str.strip() == "+0 Xu":
-							print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
-							while True:
-								print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
-								print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
-								print(f"{Colors.red}2. Kết thúc chương trình")
-								opt = None
-								try:
-									opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
-								except:
-									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
-									continue
-								if opt == 1:
-									os.system('clear')
-									id_tiktok = chon_id_tiktok()
-									for _ in range(3):
-										check_log = check_tiktok(id_tiktok,token_tds)
-										if check_log == 'success' or check_log == 'error_token':
-											break
-										else:
-											sleep(2)
-									if check_log == 'success':
-										dem_tong = 0
-										check_duyet = 0
-										break  # Thoát khỏi vòng lặp while True
-									else:
-										print(Colors.red + f"ID tiktok chưa được thêm vào cấu hình, vui lòng thêm vào cấu hình rồi nhập lại!\n")
+		while True:
+			list_job = load_job(type_load, token_tds)
+			sleep(2)
+			if isinstance(list_job, dict) == True:
+				for job in list_job['data']:
+					uid = job['id']
+					link = job['link']
+					os.system(f'termux-open-url {link}')
+					check_duyet = duyet_job(type_duyet, token_tds, uid)
+					if check_duyet != 'error':
+						dem_tong += 1
+						t_now = datetime.now().strftime("%H:%M:%S")
+						print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid}')
+						for i in range(delay, -1, -1):
+							print(Colors.green + 'Vui lòng đợi: ' + str(i) + ' giây', end='\r')
+							sleep(1)
+						if check_duyet > 9:
+							msg = duyet_job(type_nhan, token_tds, api_type)
+							msg_str = msg["msg"] if isinstance(msg, dict) and "msg" in msg else str(msg)
+							if msg_str.strip() == "+0 Xu":
+								print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
+								while True:
+									print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
+									print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
+									print(f"{Colors.red}2. Kết thúc chương trình")
+									opt = None
+									try:
+										opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
+									except:
+										print(Colors.red + "Chỉ nhập 1 hoặc 2!")
 										continue
-								elif opt == 2:
-									print(Colors.red + "Kết thúc chương trình!")
-									os._exit(0)
-								else:
-									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
-							break  # Thoát khỏi vòng lặp for
-
+									if opt == 1:
+										os.system('clear')
+										return run_jobs(token_tds)
+									elif opt == 2:
+										print(Colors.red + "Kết thúc chương trình!")
+										os._exit(0)
+									else:
+										print(Colors.red + "Chỉ nhập 1 hoặc 2!")
 					if dem_tong == max_job:
 						print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
 						while True:
@@ -373,48 +345,8 @@ if check_log == 'success':
 									os.system('clear')
 									break
 								elif choice_menu == 2:
-									while True:
-										id_tiktok = chon_id_tiktok()
-										for _ in range(3):
-											check_log = check_tiktok(id_tiktok,token_tds)
-											if check_log == 'success' or check_log == 'error_token':
-												break
-											else:
-												sleep(2)
-										if check_log == 'success':
-											dem_tong = 0
-											doi_id = True
-											os.system('clear')
-											break
-										elif check_log == 'error_token':
-											os.system('clear')
-											print(Colors.red + f"ID tiktok chưa được thêm vào cấu hình, vui lòng thêm vào cấu hình rồi nhập lại!\n")
-										else:
-											os.system('clear')
-											print(Colors.red + f"Lỗi sever vui lòng nhập lại!\n")
-									if doi_id:
-										break
-									while True:
-										try:
-											delay = int(Write.Input("Thời gian delay giữa các job (giây):", Colors.green_to_yellow, interval=0.0025))
-											if delay > 1:
-												break
-											else:
-												print(Colors.red + f"Delay tối thiểu là 3\n")
-										except:
-											print(Colors.red + f"Vui lòng nhập một số > 2\n")
-									while True:
-										try:
-											max_job = int(Write.Input("Dừng lại khi làm được số nhiệm vụ là:", Colors.green_to_yellow, interval=0.0025))
-											if max_job > 9:
-												break
-											else:
-												print(Colors.red + f"Tối thiểu là 10\n")
-										except:
-											print(Colors.red + f"Vui lòng nhập một số > 9\n")
-									dem_tong = 0
 									os.system('clear')
-									break
+									return run_jobs(token_tds)
 								elif choice_menu == 3:
 									print(Colors.red + "Kết thúc chương trình!")
 									os._exit(0)
@@ -422,4 +354,6 @@ if check_log == 'success':
 									print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
 							except:
 								print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
-								continue
+						continue
+
+	run_jobs(token_tds)
