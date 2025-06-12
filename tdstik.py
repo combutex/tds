@@ -287,7 +287,7 @@ if check_log == 'success':
 										else:
 											os.system('clear')
 											print(Colors.red + f"Lỗi sever vui lòng nhập lại!\n")
-									dem_tong = 0
+									# KHÔNG reset dem_tong, chỉ đổi id_tiktok
 									os.system('clear')
 									break
 								elif opt == 2:
