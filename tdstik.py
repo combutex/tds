@@ -251,26 +251,38 @@ if check_log == 'success':
 					t_now = datetime.now().strftime("%H:%M:%S")
 					print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid}')
 
-					if check_duyet > 9:
-						sleep(3)
-						# Bắt lại output khi nhận xu
-						f = io.StringIO()
-						with redirect_stdout(f):
-							duyet_job(type_nhan, token_tds, api_type)
-						output = f.getvalue()
-						if '+0 xu' in output:
-							print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế, bạn nhận được +0 xu sau 10 nhiệm vụ!")
-							while True:
-								print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
-								print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
-								print(f"{Colors.red}2. Kết thúc chương trình")
-								opt = None
-								try:
-									opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
-								except:
-									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
-									continue
-								if opt == 1:
+					if dem_tong == max_job:
+						print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
+						while True:
+							print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
+							print(f"{Colors.green}1. Chạy tiếp với ID TikTok hiện tại")
+							print(f"{Colors.cyan}2. Đổi ID TikTok và chạy tiếp")
+							print(f"{Colors.red}3. Kết thúc chương trình")
+							try:
+								choice_menu = int(Write.Input("Lựa chọn của bạn (1/2/3):", Colors.green_to_yellow, interval=0.0025))
+								if choice_menu == 1:
+									while True:
+										try:
+											delay = int(Write.Input("Thời gian delay giữa các job (giây):", Colors.green_to_yellow, interval=0.0025))
+											if delay > 1:
+												break
+											else:
+												print(Colors.red + f"Delay tối thiểu là 3\n")
+										except:
+											print(Colors.red + f"Vui lòng nhập một số > 2\n")
+									while True:
+										try:
+											max_job = int(Write.Input("Dừng lại khi làm được số nhiệm vụ là:", Colors.green_to_yellow, interval=0.0025))
+											if max_job > 9:
+												break
+											else:
+												print(Colors.red + f"Tối thiểu là 10\n")
+										except:
+											print(Colors.red + f"Vui lòng nhập một số > 9\n")
+									dem_tong = 0
+									os.system('clear')
+									break
+								elif choice_menu == 2:
 									while True:
 										id_tiktok = Write.Input("Nhập ID tiktok chạy (lấy ở mục cấu hình web):", Colors.green_to_yellow, interval=0.0025)
 										for _ in range(3):
@@ -287,14 +299,35 @@ if check_log == 'success':
 										else:
 											os.system('clear')
 											print(Colors.red + f"Lỗi sever vui lòng nhập lại!\n")
-									# KHÔNG reset dem_tong, chỉ đổi id_tiktok
+									while True:
+										try:
+											delay = int(Write.Input("Thời gian delay giữa các job (giây):", Colors.green_to_yellow, interval=0.0025))
+											if delay > 1:
+												break
+											else:
+												print(Colors.red + f"Delay tối thiểu là 3\n")
+										except:
+											print(Colors.red + f"Vui lòng nhập một số > 2\n")
+									while True:
+										try:
+											max_job = int(Write.Input("Dừng lại khi làm được số nhiệm vụ là:", Colors.green_to_yellow, interval=0.0025))
+											if max_job > 9:
+												break
+											else:
+												print(Colors.red + f"Tối thiểu là 10\n")
+										except:
+											print(Colors.red + f"Vui lòng nhập một số > 9\n")
+									dem_tong = 0
 									os.system('clear')
 									break
-								elif opt == 2:
+								elif choice_menu == 3:
 									print(Colors.red + "Kết thúc chương trình!")
 									exit()
 								else:
-									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+									print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
+							except:
+								print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
+								continue
 
 
 
