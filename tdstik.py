@@ -303,7 +303,7 @@ if check_log == 'success':
 						msg = duyet_job(type_nhan, token_tds, api_type)
 						# Tìm số xu nhận được trong chuỗi msg
 						xu_nhan_duoc = None
-						match = re.search(r'\+([0-9]+) xu', str(msg))
+						match = re.search(r'\+([0-9]+) xu', str(msg), re.IGNORECASE)
 						if match:
 							xu_nhan_duoc = int(match.group(1))
 						# Nếu không match được hoặc nhận được 0 xu thì hiện menu
