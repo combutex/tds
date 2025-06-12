@@ -317,7 +317,7 @@ if check_log == 'success':
 									break
 								elif opt == 2:
 									print(Colors.red + "Kết thúc chương trình!")
-									raise SystemExit
+									sys.exit()
 								else:
 									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
 
@@ -392,7 +392,7 @@ if check_log == 'success':
 									break
 								elif choice_menu == 3:
 									print(Colors.red + "Kết thúc chương trình!")
-									raise SystemExit
+									sys.exit()
 								else:
 									print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
 							except:
