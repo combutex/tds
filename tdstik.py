@@ -303,12 +303,12 @@ if check_log == 'success':
 						msg = duyet_job(type_nhan, token_tds, api_type)
 						# Tìm số xu nhận được trong chuỗi msg
 						xu_nhan_duoc = None
-						match = re.search(r'\+([0-9]+) xu', msg)
+						match = re.search(r'\+([0-9]+) xu', str(msg))
 						if match:
 							xu_nhan_duoc = int(match.group(1))
-						# Nếu nhận được 0 xu thì hiện menu
-						if xu_nhan_duoc == 0:
-							print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế, bạn nhận được +0 xu sau 10 nhiệm vụ!")
+						# Nếu không match được hoặc nhận được 0 xu thì hiện menu
+						if xu_nhan_duoc is None or xu_nhan_duoc == 0:
+							print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
 							while True:
 								print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
 								print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
@@ -325,7 +325,7 @@ if check_log == 'success':
 									break
 								elif opt == 2:
 									print(Colors.red + "Kết thúc chương trình!")
-									sys.exit()
+									os._exit(0)
 								else:
 									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
 
@@ -400,7 +400,7 @@ if check_log == 'success':
 									break
 								elif choice_menu == 3:
 									print(Colors.red + "Kết thúc chương trình!")
-									sys.exit()
+									os._exit(0)
 								else:
 									print(Colors.red + "Chỉ nhập 1, 2 hoặc 3!")
 							except:
