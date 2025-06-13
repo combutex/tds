@@ -284,29 +284,6 @@ if check_log == 'success':
 					os.system(f'termux-open-url {link}')
 					check_duyet = duyet_job(type_duyet, token_tds, uid)
 					if check_duyet != 'error':
-						nhan_xu = duyet_job(type_nhan, token_tds, uid)
-						msg_str = nhan_xu["msg"] if isinstance(nhan_xu, dict) and "msg" in nhan_xu else str(nhan_xu)
-						if "+0 Xu" in msg_str:
-							print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
-							while True:
-								print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
-								print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
-								print(f"{Colors.red}2. Kết thúc chương trình")
-								opt = None
-								try:
-									opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
-								except:
-									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
-									continue
-								if opt == 1:
-									os.system('clear')
-									return run_jobs(token_tds)
-								elif opt == 2:
-									print(Colors.red + "Kết thúc chương trình!")
-									os._exit(0)
-								else:
-									print(Colors.red + "Chỉ nhập 1 hoặc 2!")
-							break
 						dem_tong += 1
 						t_now = datetime.now().strftime("%H:%M:%S")
 						print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid}')
@@ -315,8 +292,7 @@ if check_log == 'success':
 							sleep(1)
 						if check_duyet > 9:
 							msg = duyet_job(type_nhan, token_tds, api_type)
-							msg_str = msg["msg"] if isinstance(msg, dict) and "msg" in msg else str(msg)
-							if msg_str.strip() == "+0 Xu":
+							if isinstance(msg, dict) and "msg" in msg and "+0 Xu" in msg["msg"]:
 								print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
 								while True:
 									print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
