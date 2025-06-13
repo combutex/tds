@@ -292,7 +292,7 @@ if check_log == 'success':
 							sleep(1)
 						if check_duyet > 9:
 							msg = duyet_job(type_nhan, token_tds, api_type)
-							if isinstance(msg, dict) and "msg" in msg and "+0 Xu" in msg["msg"]:
+							if "+0 Xu" in str(msg):
 								print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
 								while True:
 									print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
