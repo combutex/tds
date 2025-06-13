@@ -292,26 +292,27 @@ if check_log == 'success':
 							sleep(1)
 						if check_duyet > 9:
 							msg = duyet_job(type_nhan, token_tds, api_type)
-							if "+0 Xu" in str(msg):
-								print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
-								while True:
-									print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
-									print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
-									print(f"{Colors.red}2. Kết thúc chương trình")
-									opt = None
-									try:
-										opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
-									except:
-										print(Colors.red + "Chỉ nhập 1 hoặc 2!")
-										continue
-									if opt == 1:
-										os.system('clear')
-										return run_jobs(token_tds)
-									elif opt == 2:
-										print(Colors.red + "Kết thúc chương trình!")
-										os._exit(0)
-									else:
-										print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+							if isinstance(msg, dict) and "data" in msg:
+								if msg["data"]["msg"] == "+0 Xu":
+									print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
+									while True:
+										print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
+										print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
+										print(f"{Colors.red}2. Kết thúc chương trình")
+										opt = None
+										try:
+											opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
+										except:
+											print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+											continue
+										if opt == 1:
+											os.system('clear')
+											return run_jobs(token_tds)
+										elif opt == 2:
+											print(Colors.red + "Kết thúc chương trình!")
+											os._exit(0)
+										else:
+											print(Colors.red + "Chỉ nhập 1 hoặc 2!")
 					if dem_tong == max_job:
 						print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
 						while True:
