@@ -283,36 +283,36 @@ if check_log == 'success':
 					link = job['link']
 					os.system(f'termux-open-url {link}')
 					check_duyet = duyet_job(type_duyet, token_tds, uid)
-					if check_duyet != 'error':
+					msg_str = check_duyet["msg"] if isinstance(check_duyet, dict) and "msg" in check_duyet else str(check_duyet)
+					if "+0 Xu" in msg_str:
+						print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
+						while True:
+							print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
+							print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
+							print(f"{Colors.red}2. Kết thúc chương trình")
+							opt = None
+							try:
+								opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
+							except:
+								print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+								continue
+							if opt == 1:
+								os.system('clear')
+								return run_jobs(token_tds)
+							elif opt == 2:
+								print(Colors.red + "Kết thúc chương trình!")
+								os._exit(0)
+							else:
+								print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+						break
+					# Nếu không phải +0 Xu thì tiếp tục như bình thường
+					if check_duyet != 'error' and "+0 Xu" not in msg_str:
 						dem_tong += 1
 						t_now = datetime.now().strftime("%H:%M:%S")
 						print(f'{Colors.yellow}[{dem_tong}] {Colors.red}| {Colors.cyan}{t_now} {Colors.red}| {Colors.pink}{type_type} {Colors.red}| {Colors.light_gray}{uid}')
 						for i in range(delay, -1, -1):
 							print(Colors.green + 'Vui lòng đợi: ' + str(i) + ' giây', end='\r')
 							sleep(1)
-						if check_duyet > 9:
-							msg = duyet_job(type_nhan, token_tds, api_type)
-							msg_str = msg["msg"] if isinstance(msg, dict) and "msg" in msg else str(msg)
-							if msg_str.strip() == "+0 Xu":
-								print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
-								while True:
-									print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
-									print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
-									print(f"{Colors.red}2. Kết thúc chương trình")
-									opt = None
-									try:
-										opt = int(Write.Input("Lựa chọn của bạn (1/2):", Colors.green_to_yellow, interval=0.0025))
-									except:
-										print(Colors.red + "Chỉ nhập 1 hoặc 2!")
-										continue
-									if opt == 1:
-										os.system('clear')
-										return run_jobs(token_tds)
-									elif opt == 2:
-										print(Colors.red + "Kết thúc chương trình!")
-										os._exit(0)
-									else:
-										print(Colors.red + "Chỉ nhập 1 hoặc 2!")
 					if dem_tong == max_job:
 						print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
 						while True:
