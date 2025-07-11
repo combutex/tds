@@ -87,22 +87,67 @@ def check_tiktok(id_tiktok, token):
 	except:
 		return 'error'
 
+def mark_blocked_id(blocked_id):
+	lines = []
+	current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+	try:
+		with open('tiktok_ids.txt', 'r') as f:
+			for line in f:
+				if line.strip():
+					parts = line.strip().split('|')
+					if parts[0] == blocked_id:
+						if len(parts) == 2:
+							lines.append(f"{parts[0]}|{parts[1]}|blocked|{current_time}\n")
+						else:
+							lines.append(f"{parts[0]}|blocked|{current_time}\n")
+					else:
+						lines.append(line)
+		with open('tiktok_ids.txt', 'w') as f:
+			f.writelines(lines)
+	except FileNotFoundError:
+		pass
+
+def unmark_blocked_id(id_to_unmark):
+	lines = []
+	try:
+		with open('tiktok_ids.txt', 'r') as f:
+			for line in f:
+				if line.strip():
+					parts = line.strip().split('|')
+					if parts[0] == id_to_unmark and "blocked" in parts:
+						if len(parts) > 2:  # Có username
+							lines.append(f"{parts[0]}|{parts[1]}\n")
+						else:  # Không có username
+							lines.append(f"{parts[0]}\n")
+					else:
+						lines.append(line)
+		with open('tiktok_ids.txt', 'w') as f:
+			f.writelines(lines)
+	except FileNotFoundError:
+		pass
+
 def chon_id_tiktok():
 	ids = []
 	try:
 		with open('tiktok_ids.txt', 'r') as f:
 			for line in f:
 				if '|' in line:
-					id_, username = line.strip().split('|', 1)
-					ids.append((id_, username))
+					parts = line.strip().split('|')
+					id_ = parts[0]
+					username = parts[1] if len(parts) > 1 and parts[1] != "blocked" else ""
+					is_blocked = "blocked" in parts
+					block_time = parts[-1] if is_blocked else ""
+					ids.append((id_, username, is_blocked, block_time))
 				elif line.strip():
-					ids.append((line.strip(), ''))
+					ids.append((line.strip(), '', False, ""))
 	except FileNotFoundError:
 		pass
 	if ids:
 		print(Colors.yellow + 'Danh sách ID TikTok đã lưu:')
-		for idx, (id_, username) in enumerate(ids, 1):
-			print(f'{Colors.green}{idx}. {Colors.cyan}{id_} {Colors.light_gray}| {Colors.pink}{username}')
+		for idx, (id_, username, is_blocked, block_time) in enumerate(ids, 1):
+			id_color = Colors.red if is_blocked else Colors.cyan
+			status = f"{Colors.red}[BLOCKED {block_time}]" if is_blocked else ""
+			print(f'{Colors.green}{idx}. {id_color}{id_} {Colors.light_gray}| {Colors.pink}{username} {status}')
 		print(f'{Colors.green}{len(ids)+1}. {Colors.red}Nhập ID mới')
 		while True:
 			try:
@@ -121,12 +166,16 @@ def chon_id_tiktok():
 		if id_new:
 			break
 	username_new = Write.Input('Nhập username TikTok tương ứng:', Colors.green_to_yellow, interval=0.0025)
-	if not any(id_new == id_ for id_, _ in ids):
+	if not any(id_new == id_ for id_, _, _, _ in ids):
 		luu = Write.Input('Bạn có muốn lưu ID này vào danh sách? (y/n):', Colors.green_to_yellow, interval=0.0025)
 		if luu.lower() == 'y':
 			with open('tiktok_ids.txt', 'a') as f:
 				f.write(f'{id_new}|{username_new}\n')
 	return id_new
+
+def thong_bao_loi(msg):
+    os.system(f'termux-notification --title "TDS Tool" --content "{msg}" --priority high')
+    os.system('termux-vibrate -d 1000')
 
 os.system('clear')
 banner = r'''
@@ -294,7 +343,9 @@ if check_log == 'success':
 							msg = duyet_job(type_nhan, token_tds, api_type)
 							if isinstance(msg, dict) and "data" in msg:
 								if msg["data"]["msg"] == "+0 Xu":
+									thong_bao_loi("Lỗi: Không nhận được xu! Kiểm tra lại tool.")
 									print(Colors.red + f"\nPhát hiện ID TikTok bị hạn chế hoặc lỗi nhận xu!")
+									mark_blocked_id(id_tiktok)
 									while True:
 										print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
 										print(f"{Colors.cyan}1. Đổi ID TikTok và chạy tiếp")
@@ -313,7 +364,10 @@ if check_log == 'success':
 											os._exit(0)
 										else:
 											print(Colors.red + "Chỉ nhập 1 hoặc 2!")
+								elif "xu" in msg["data"]:  # Nhận xu thành công
+									unmark_blocked_id(id_tiktok)
 					if dem_tong == max_job:
+						thong_bao_loi(f"Đã hoàn thành {max_job} nhiệm vụ! Kiểm tra tool để tiếp tục.")
 						print(f'{Colors.green}Hoàn thành {max_job} nhiệm vụ!')
 						while True:
 							print(f"{Colors.yellow}Bạn muốn làm gì tiếp theo?")
